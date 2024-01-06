@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>My Word Add-in</title>
+    <script type="text/javascript" src="https://appsforoffice.microsoft.com/lib/1/hosted/office.js"></script>
+    <script type="text/javascript" src="taskpane.js"></script>
+</head>
+<body>
+    <h1>Welcome to My Word Add-in</h1>
+    <button id="insertTextButton">Insert Text</button>
+</body>
+</html>
+
+Office.onReady(function (info) {
+    if (info.host === Office.HostType.Word) {
+        // Assign event handlers and initialize your Add-in here
+        document.getElementById("insertTextButton").onclick = insertText;
+    }
+});
+
+function insertText() {
+    Word.run(function (context) {
+        // Get the current selection
+        var selection = context.document.getSelection();
+
+        // Queue a command to insert text into the document
+        selection.insertText("Hello from Word Add-in!", Word.InsertLocation.end);
+
+        // Synchronize the document state by executing the queued-up commands
+        return context.sync();
+    })
+    .catch(function (error) {
+        console.log(error.message);
+    });
+}
+
+<?xml version="1.0" encoding="UTF-8"?>
+<OfficeApp
+    xmlns="http://schemas.microsoft.com/office/appforoffice/1.1"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:bt="http://schemas.microsoft.com/office/officeappbasictypes/1.0"
+    xmlns:ov="http://schemas.microsoft.com/office/taskpaneappversionoverrides"
+    xsi:type="TaskPaneApp">
+
+  <Id>YourAddInId</Id>
+  <Version>1.0.0.0</Version>
+  <ProviderName>Your Provider Name</ProviderName>
+  <DefaultLocale>en-US</DefaultLocale>
+  <DisplayName DefaultValue="My Word Add-in" />
+  <Description DefaultValue="Description of your Word Add-in" />
+  
+  <IconUrl DefaultValue="https://yourdomain.com/youricon.png" />
+
+  <Hosts>
+    <Host Name="Document"/>
+  </Hosts>
+
+  <DefaultSettings>
+    <SourceLocation DefaultValue="https://yourdomain.com/youraddin/" />
+  </DefaultSettings>
+
+  <Permissions>ReadWriteDocument</Permissions>
+
+  <Requirements>
+    <Sets DefaultMinVersion="1.1">
+      <Set Name="CustomPane"/>
+    </Sets>
+  </Requirements>
+
+  <AddinCommands>
+    <AddinCommand>
+      <Name>InsertText</Name>
+      <IconUrl>https://yourdomain.com/inserticon.png</IconUrl>
+      <Tooltip>Insert Text</Tooltip>
+      <Action xsi:type="ShowTaskpane">
+        <SourceLocation resid="InsertText.Url" />
+      </Action>
+    </AddinCommand>
+  </AddinCommands>
+
+  <VersionOverrides xmlns="http://schemas.microsoft.com/office/taskpaneappversionoverrides" xsi:type="VersionOverridesV1_0">
+    <Hosts>
+      <Host xsi:type="Document">
+        <DesktopFormFactor>
+          <Width>300</Width>
+          <Height>300</Height>
+        </DesktopFormFactor>
+      </Host>
+    </Hosts>
+    <Resources>
+      <bt:Urls>
+        <bt:Url id="InsertText.Url" DefaultValue="https://yourdomain.com/youraddin/index.html" />
+      </bt:Urls>
+    </Resources>
+  </VersionOverrides>
+
+</OfficeApp>
